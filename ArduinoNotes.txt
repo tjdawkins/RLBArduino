@@ -1,0 +1,10 @@
+1. When gain is increased getting invalid SOF when setting calibration and reading temp.
+	- Gain increase produces a measurable distance increase in inventory and getCalibration()
+	- Gain values are noted in the writeARCBGain() and in the datasheet for AMS tag.
+	
+	
+2. Need to do more temperature tests, but seemed to be withing a few degrees of actual
+	when using setCalibration().
+	
+3. Haven't finished implementing writing the data to file and deciding on which data 
+	structure to use for time and temperature data. Need to collaborate with Dean.
