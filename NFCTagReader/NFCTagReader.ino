@@ -1,6 +1,3 @@
-
-
-
 /*************************************************************
  * 
  * Read NFC Tag and get Temperature Data
@@ -17,26 +14,17 @@
  *       
  *       - enclose debugging statements in conditionals and
  *         set up debugging levels DEBUG = 1, 2, 3...
- *         
- *       - finish going through the last few functions to
- *         clean them up and debug with tag.
- *         
- *       - Brush up the loop() and its use of states and response
- *         to exceptions.
- *         
+ *               
  *       - Document the functions and code
  *       
  *       - Define constants (maybe) for the hardware instructions
  *       
- *       
  *       RESPONSE FORMAT
  *       
  *       |-Result Code-|- Length -|- Response Flags -|- Data -|- CRC -|- CRC -|- Error -|
- *        
- *        
- *       
+ *             
  */
-
+#include <SD.h>
 
 
 
@@ -65,6 +53,8 @@ int READ_DELAY = 100;
 
 // File variables
 FILE *outFile;
+FILE *tmpFile;
+FILE *lockFile;
 
 // Serial State variable
 byte responseCode;
@@ -141,7 +131,8 @@ void setup() {
   
   // Set up Arduino Virutal Serial
   Serial.begin(57600);
-  Serial.println("what up");  
+  
+  system("python /home/root/SPP.py &");
   
   // Set up Serial Communcation with Reader
   Serial1.begin(57600);
@@ -179,7 +170,7 @@ int sendEcho() {
   //readResponse(s1);
 
   
-  // Waiting for Response
+  // Waiting for Responseroot
   delay(READ_DELAY);
   
   int i = 0;
@@ -797,13 +788,10 @@ int getTemp(byte* temp) {
   if (responseCode == 0x80) { // is response code good?
     
     Serial.println("Read Temperature - Success");
-    // Do something
-
     // Since chip has a 10 bit ADC try to get only 10...
-    
     int temps = ((0x33 & RXBuffer[4]) << 8) | RXBuffer[3];
-    // 
-    
+
+    // Temperature Bits
     temp[0] = RXBuffer[3];
     temp[1] = RXBuffer[4];
 
@@ -811,27 +799,57 @@ int getTemp(byte* temp) {
     //Serial.println(*temp, DEC);
     Serial.println(temps,DEC);
 
+    // Calculate the temperature Celsius
+    // Formula per data sheet
     double t = temps*0.169-92.7-5.4;
     t = (t*9/5) + 32;
-    
+
+
+    //DEBUG
     Serial.print("Temperature: ");
     Serial.print(t);
     Serial.println(" F"); 
 
-    outFile = fopen("/home/root/tempOut","a");
+    char outStr[] = "/home/root/data/dataOut\0";
+    char tmpStr[] = "/home/root/data/dataTmp\0";
+    char lockStr[] = "/home/root/data/.LOCK\0";
+    
+    
+    lockFile = fopen(lockStr,"r");
+    tmpFile = fopen(tmpStr,"r");
+    int renStat = -1;
 
-    if(outFile == NULL) {
-
-      system("touch /home/root/tempOut");
+    // Check locks
+    if(lockFile == NULL) {
+      // Check temporary file
+      if(tmpFile != NULL) {
+        // No lock so rename this to regular
+        // output file. We assume outFile
+        // doesn't exist since python will
+        // have deleted it.
+        renStat = rename(tmpStr,outStr);
+        Serial.println("**********Rename the file*************");
+      }
+      outFile = fopen(outStr,"a");
+      fprintf(outFile, "%d:%f\n", millis(), t);
+      fclose(outFile);
       
     } else {
 
+      // If there is a lock write into temporary file
+      Serial.println("*************Using temp File*************");
+      outFile = fopen(tmpStr,"a");
+      Serial.println("Opened File");
       fprintf(outFile, "%d:%f\n", millis(), t);
-      
+      Serial.println("Wrote to file");
+      fclose(outFile);
+      Serial.println("Closed outFile");
     }
 
-    fclose(outFile);
-      
+    if(lockFile != NULL)
+      fclose(lockFile);
+    if(tmpFile != NULL)
+      fclose(tmpFile);
   
     return 1;
     
@@ -851,7 +869,7 @@ int getTemp(byte* temp) {
 byte temp[2];
 int state =  0;
 int count = 0;
-int DELAY = 500;
+int DELAY = 300;
 int calRcvd = 0;
 
 void loop() {
