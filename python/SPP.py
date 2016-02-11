@@ -49,8 +49,15 @@ class Profile(dbus.service.Object):
             print("Reading from socket")
             data = server_sock.recv(1024)
             print("Read: %s" % data)
-            print("Going into loop:")
-            hooks.loop(server_sock, data)
+            
+            
+            if (data == "GET_DATA")
+                print("Going into loop:")
+                hooks.loop(server_sock, data)
+            else if(data == "GET_START_TIME")
+                server_sock.send(123)
+                
+            
             print("Have come out of hooks.loop")
 
         except IOError:
