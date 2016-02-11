@@ -9,20 +9,28 @@ def sendtophone(s):
 
     open(lock, "a").close()
     print("Created Lock File")
-    with open(data, "r+") as f:
-        for line in f:
-            print("Line: ", line)
-            s.send(line)
-            
-        print("Going to truncate it...")
-        f.truncate()
 
-    try:
-        print("Going to remove LOCK")
-        os.remove(data)
-        os.remove(lock)
-    except OSError:
-        pass
+    # If it exists
+    if (os.path.isfile(data):
+        
+        with open(data, "r+") as f:
+        
+            for line in f:
+                print("Line: ", line)
+                s.send(line)
+
+        try:
+            print("Going to remove LOCK")
+            os.remove(data)
+            os.remove(lock)
+        except OSError:
+            pass
+    else:
+
+        print("Nothing to read: NO FILE FOUND")
+        if (os.path.isfile(lock):
+            os.remove(lock)
+            
 
 def init(s):
 
