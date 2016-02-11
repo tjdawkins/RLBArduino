@@ -19,3 +19,8 @@ Add bluetooth startup to init
 2. rfkill unblock Bluetooth
 3. chmod +x 
 4. update-rc.d enableBT.sh defaults
+
+
+
+Skip the service... Need to install the above inits
+
