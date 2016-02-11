@@ -131,8 +131,9 @@ void setup() {
   
   // Set up Arduino Virutal Serial
   Serial.begin(57600);
-  
-  system("python /home/root/SPP.py &");
+
+  // Remove call from sketch.
+  // system("python /home/root/SPP.py &");
   
   // Set up Serial Communcation with Reader
   Serial1.begin(57600);
