@@ -1,7 +1,9 @@
 #!/bin/sh
 
 # Make the data directory 
-mkdir /home/root/data
+if [ ! -d /home/root/data ]; then
+	mkdir /home/root/data
+fi
 
 # Setup bluetooth and sketch starup
 if [ ! -d /etc/init.d]; then
