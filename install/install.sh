@@ -6,7 +6,7 @@ if [ ! -d /home/root/data ]; then
 fi
 
 # Setup bluetooth and sketch starup
-if [ ! -d /etc/init.d]; then
+if [ ! -d /etc/init.d ]; then
 	mkdir /etc/init.d
 fi
 
@@ -20,6 +20,6 @@ chmod +x /etc/init.d/startSPP.sh
 
 cd /etc/init.d
 
-update-rc.d enableBT.sh default
-update-rc.d startSketch.sh default
-update-rc.d startSPP.sh default
+update-rc.d enableBT.sh defaults
+update-rc.d startSketch.sh defaults
+update-rc.d startSPP.sh defaults
