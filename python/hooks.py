@@ -11,7 +11,7 @@ def sendtophone(s):
     print("Created Lock File")
 
     # If it exists
-    if (os.path.isfile(data):
+    if os.path.isfile(data):
         
         with open(data, "r+") as f:
         
@@ -28,7 +28,7 @@ def sendtophone(s):
     else:
 
         print("Nothing to read: NO FILE FOUND")
-        if (os.path.isfile(lock):
+        if os.path.isfile(lock):
             os.remove(lock)
             
 
