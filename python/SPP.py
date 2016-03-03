@@ -51,10 +51,10 @@ class Profile(dbus.service.Object):
             print("Read: %s" % data)
             
             
-            if (data == "GET_DATA")
+            if (data == "GET_DATA"):
                 print("Going into loop:")
                 hooks.loop(server_sock, data)
-            else if(data == "GET_START_TIME")
+            elif(data == "GET_START_TIME"):
                 server_sock.send(123)
                 
             
