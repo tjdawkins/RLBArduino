@@ -7,6 +7,7 @@ def sendtophone(s):
     lock = "/home/root/data/.LOCK"
     data = "/home/root/data/dataOut"
 
+    # Create a lock file
     open(lock, "a").close()
     print("Created Lock File")
 
@@ -27,7 +28,9 @@ def sendtophone(s):
             pass
     else:
 
+        # Nothing to read
         print("Nothing to read: NO FILE FOUND")
+        s.send(0);
         if os.path.isfile(lock):
             os.remove(lock)
             
