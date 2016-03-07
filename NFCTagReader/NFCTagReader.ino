@@ -870,7 +870,7 @@ int getTemp(byte* temp) {
 byte temp[2];
 int state =  0;
 int count = 0;
-int DELAY = 300;
+int DELAY = 1000;
 int calRcvd = 0;
 
 void loop() {
@@ -880,7 +880,9 @@ void loop() {
   switch(state) {
   
     case 0:
-  
+
+      delay(DELAY);
+      
       if(sendEcho() == 1) {
         state++;
         count--;
@@ -889,19 +891,15 @@ void loop() {
         break;;
       }
 
-
-      delay(DELAY);
-
     case 1:
       
       if(setProtocol() == 1) {
         delay(100);
         getDeviceID();      
-
+        
         // Change the gain to max
         // 0 = 34dB | 1 = 32dB | 3 = 27dB | 7 = 20dB | F = 8dB
         //writeARCBGain(0xD0);
-        
         
         state++;
         count--;
@@ -937,7 +935,6 @@ void loop() {
 
           //readBlock(0x05);
 
-          
           state++;
           count--;
           //break;;
@@ -951,8 +948,8 @@ void loop() {
     case 4:
       delay(DELAY);
       delay(100);
-      if(setCalibration() == 1) {
-      //if(1) {
+      //if(setCalibration() == 1) {
+      if(1) {
         state++;
         count--;
       } else {
