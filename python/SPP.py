@@ -40,35 +40,35 @@ class Profile(dbus.service.Object):
         server_sock.setblocking(1)
 
         # Sends Version
-        #print(server_sock.recv())
+        print("hooks.init() ->")
         hooks.init(server_sock)
+        print("hooks.init() <-")
+
 
         try:
-
-            # Wait for string to get the data
-            print("Reading from socket")
+            # Wait for request
+            print("Read from socket (Pre Loop):")
             data = server_sock.recv(1024)
             print("Read: %s" % data)
-            
+            print("while ->")
 
+            while (data != "CLOSE"):
 
+                if data == "GET_DATA":
+                    print("Send the data to phone in loop")
+                    hooks.sendtophone(server_sock)
 
-            
-            if (data == "GET_DATA"):
-                print("Going into loop:")
-                hooks.loop(server_sock, data)
-            elif(data == "GET_START_TIME"):
-                print("Time Requested:")
-                server_sock.send(123)
-            elif(data == "CHECK_DATA"):
-                print("Check for available data:")
-                if os.path.isfile("/home/root/data/dataOut"):
-                    server_sock.send("1")
-                else:
-                    server_sock.send("-1")
+                elif data == "CHECK_DATA": 
+                    print("Check for available data:")
+                    if os.path.isfile("/home/root/data/dataOut"):
+                        server_sock.send("1")
+                    else:
+                        server_sock.send("-1")
 
-            
-            print("Have come out of hooks.loop")
+                print("Read from socket (In Loop):")
+                data = server_sock.recv(1024)
+                print("Read from socket: %s" % data)
+
 
         except IOError:
             pass

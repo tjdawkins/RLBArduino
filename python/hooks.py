@@ -38,12 +38,11 @@ def sendtophone(s):
 def init(s):
 
     print("Connected!")
-    s.send("Data" if os.path.isfile("/home/root/data/dataOut") else "No Data")
+    s.send("Data Available" if os.path.isfile("/home/root/data/dataOut") else "No Data")
 
 
-def loop(s, data):
-    print("Sending to Phone")
-    sendtophone(s)
+def loop(s):
+    print("Never go in here")
 
 
 def close(s):
