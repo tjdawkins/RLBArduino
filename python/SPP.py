@@ -50,13 +50,21 @@ class Profile(dbus.service.Object):
             data = server_sock.recv(1024)
             print("Read: %s" % data)
             
+
+
+
             
             if (data == "GET_DATA"):
                 print("Going into loop:")
                 hooks.loop(server_sock, data)
             elif(data == "GET_START_TIME"):
                 server_sock.send(123)
-                
+            elif(data == "CHECK_DATA"):
+                if os.path.isfile(data):
+                    server_sock.send(1)
+                else
+                    server_sock.send(-1)
+
             
             print("Have come out of hooks.loop")
 
