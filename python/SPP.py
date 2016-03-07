@@ -58,11 +58,13 @@ class Profile(dbus.service.Object):
                 print("Going into loop:")
                 hooks.loop(server_sock, data)
             elif(data == "GET_START_TIME"):
+                print("Time Requested:")
                 server_sock.send(123)
             elif(data == "CHECK_DATA"):
-                if os.path.isfile(data):
+                print("Check for available data:")
+                if os.path.isfile("/home/root/data/dataOut"):
                     server_sock.send(1)
-                else
+                else:
                     server_sock.send(-1)
 
             
