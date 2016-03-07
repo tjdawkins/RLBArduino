@@ -26,8 +26,6 @@
  */
 #include <SD.h>
 
-
-
 // CR95HF COMMANDS
 
 // Provides Information about CR95HF
@@ -47,7 +45,7 @@ const byte PROTO_15693 =    0x01;
 byte TXBuffer[100];     // transmit buffer
 byte RXBuffer[100];     // receive buffer
 char NFC_UID[8];       // Will be used to Store UID
-int LEDPIN = 7;
+int LEDPIN = 13;
 byte calibrationData[4];  // Calibration Data
 int READ_DELAY = 100;
 
@@ -60,7 +58,8 @@ FILE *lockFile;
 byte responseCode;
 int responseLength;
  
-
+// Time offset
+long toffset;
 
 
 /*
@@ -126,14 +125,26 @@ void setup() {
   delay(10);                      // send a wake up    
 
 
+  // Set the time offset based on the Edison system time
+  system("date +%s > /home/root/data/time");
+  system("echo \"\\0\" >> /home/root/data/time");
+  
+  toffset = 1;
+
+  
+  char timeFileName[] = "/home/root/data/time\0";
+  char buf[64];
+  FILE* timeFile = fopen(timeFileName,"r");
+  fgets(buf, 64, timeFile);
+  fclose(timeFile);
+  toffset = atol(buf);
+  
+
   // Setup the LED 7 - J19 Pin 6
   pinMode(LEDPIN, OUTPUT);
   
   // Set up Arduino Virutal Serial
-  Serial.begin(57600);
-
-  // Remove call from sketch.
-  // system("python /home/root/SPP.py &");
+  Serial.begin(57600);  
   
   // Set up Serial Communcation with Reader
   Serial1.begin(57600);
@@ -143,7 +154,6 @@ void setup() {
 
 
 
- 
 
 /*********************************************************************************
 /////////////////////////// Echo Command //////////////////////////////////////
@@ -811,6 +821,11 @@ int getTemp(byte* temp) {
     Serial.print(t);
     Serial.println(" F"); 
 
+    Serial.print("Time: ");
+    Serial.print(toffset);
+
+
+
     char outStr[] = "/home/root/data/dataOut\0";
     char tmpStr[] = "/home/root/data/dataTmp\0";
     char lockStr[] = "/home/root/data/.LOCK\0";
@@ -832,7 +847,7 @@ int getTemp(byte* temp) {
         Serial.println("**********Rename the file*************");
       }
       outFile = fopen(outStr,"a");
-      fprintf(outFile, "%d:%f\n", millis(), t);
+      fprintf(outFile, "%d:%f\n", round(millis()/1000)+toffset, t);
       fclose(outFile);
       
     } else {
@@ -841,7 +856,7 @@ int getTemp(byte* temp) {
       Serial.println("*************Using temp File*************");
       outFile = fopen(tmpStr,"a");
       Serial.println("Opened File");
-      fprintf(outFile, "%d:%f\n", millis(), t);
+      fprintf(outFile, "%d:%f\n", round(millis()/1000), t);
       Serial.println("Wrote to file");
       fclose(outFile);
       Serial.println("Closed outFile");
@@ -870,7 +885,8 @@ int getTemp(byte* temp) {
 byte temp[2];
 int state =  0;
 int count = 0;
-int DELAY = 1000;
+//Overall Delay is ~DELAY*5 
+int DELAY = 300;
 int calRcvd = 0;
 
 void loop() {
@@ -882,7 +898,6 @@ void loop() {
     case 0:
 
       delay(DELAY);
-      
       if(sendEcho() == 1) {
         state++;
         count--;
@@ -893,6 +908,7 @@ void loop() {
 
     case 1:
       
+      delay(DELAY);
       if(setProtocol() == 1) {
         delay(100);
         getDeviceID();      
@@ -909,12 +925,10 @@ void loop() {
         break;;
       }
 
-      delay(DELAY);
       
     case 2:
 
       delay(DELAY);
-      
       if(doInventory() == 1) {
         state++;
         count--;
@@ -946,8 +960,7 @@ void loop() {
       }
 
     case 4:
-      delay(DELAY);
-      delay(100);
+      //delay(DELAY);
       //if(setCalibration() == 1) {
       if(1) {
         state++;
