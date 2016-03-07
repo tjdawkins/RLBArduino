@@ -63,9 +63,9 @@ class Profile(dbus.service.Object):
             elif(data == "CHECK_DATA"):
                 print("Check for available data:")
                 if os.path.isfile("/home/root/data/dataOut"):
-                    server_sock.send(1)
+                    server_sock.send("1")
                 else:
-                    server_sock.send(-1)
+                    server_sock.send("-1")
 
             
             print("Have come out of hooks.loop")
