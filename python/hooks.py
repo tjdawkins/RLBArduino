@@ -38,7 +38,7 @@ def sendtophone(s):
 def init(s):
 
     print("Connected!")
-    s.send(version)
+    s.send("Data" if os.path.isfile("/home/root/data/dataOut") else "No Data")
 
 
 def loop(s, data):
